@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from sklearn.neural_network import MLPClassifier
+from sklearn.metrics import classification_report, confusion_matrix, accuracy_score
 import numpy as np
 
 class MRA(object):
@@ -33,12 +34,17 @@ class MRA(object):
 				y_teste = dados_teste[:, col]
 				# y_teste = y_teste.reshape(len(y_teste),1)
 
-				print(X_treino, X_treino.ndim, len(X_treino))
-				print(y_treino, y_treino.ndim, len(y_treino))
+				# print(X_treino, X_treino.ndim, len(X_treino))
+				# print(y_treino, y_treino.ndim, len(y_treino))
 
 				mlp = MLPClassifier(hidden_layer_sizes = (10,))
-				mlp.fit([[ 6.9 , 3.1 , 4.9], [ 6.7 , 3. , 5. ]], np.asarray([1.1 ,1.], dtype = "|S6"))
-				# # print("score treino: %f" % mlp.score(X_treino, y_treino))
-				# # print("score teste %f" % mlp.score(X_teste, y_teste))
+				mlp.fit(X_treino, y_treino)
+				# print("score treino: %f" % mlp.score(X_treino, y_treino))
+				# print("score teste %f" % mlp.score(X_teste, y_teste))
 
-				
+				predictions = mlp.predict(X_teste)
+				print(predictions)
+
+				print(confusion_matrix(y_teste, predictions))
+				print(classification_report(y_teste, predictions))
+				print(accuracy_score(y_teste, predictions))

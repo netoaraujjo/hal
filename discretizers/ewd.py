@@ -13,32 +13,19 @@ class EWD(object):
 
 
     def discretize(self):
-        # discrete_data = np.zeros((self.n_elements, self.n_attrs))
-        discrete_data = None
+        discrete_data = []
 
         for attr_index in range(self.n_attrs):
             edges = self.__calc_edges(attr_index)
-            if discrete_data is None:
-                discrete_data = self.__fit(attr_index, edges).reshape(self.n_elements,)
-            else:
-                discrete_data = np.hstack((discrete_data, self.__fit(attr_index, edges)))
+            discrete_data.append(self.__fit(attr_index, edges))
 
-        print('Discrete data:')
-        print(discrete_data)
-        print('ndim: ', discrete_data.ndim)
-        print('shape: ', discrete_data.shape)
-        print('type: ', type(discrete_data))
-        print('len: ', len(discrete_data))
+        return np.transpose(np.array(discrete_data))
             
 
 
     def __calc_edges(self, attr_index):
         """Calcula os pontos de corte. Recebe o índice da coluna a ser discretizada"""
         col = self.data[:,attr_index]
-
-        # print(col)
-        # print('ndim: ', col.ndim)
-        # print('shape: ', col.shape)
 
         maximo = max(col)
         minimo = min(col)
@@ -50,34 +37,22 @@ class EWD(object):
         for cut_point in range(1, self.n_tracks):
             edges.append(minimo + cut_point * largura)
 
-        print(edges)
         return edges
 
 
 
     def __fit(self, attr_index, edges):
         col = self.data[:,attr_index]
-        
-        print(col)
-        print('ndim: ', col.ndim)
-        print('shape: ', col.shape)
-        print('type: ', type(col))
-        print('len: ', len(col))
 
-        discrete_col = np.zeros(self.n_elements,)
+        discrete_col = []
 
         for index, value in enumerate(col):
             for n, edge in enumerate(edges):
                 if value <= edge:
-                    discrete_col[index] = n + 1
+                    discrete_col.append(n+1)
                     break
-                discrete_col[index] = self.n_tracks
 
-        print('Discrete:')
-        print(discrete_col)
-        print('ndim: ', discrete_col.ndim)
-        print('shape: ', discrete_col.shape)
-        print('type: ', type(discrete_col))
-        print('len: ', len(discrete_col))
+            if len(discrete_col) == index:
+                discrete_col.append(self.n_tracks)
 
         return discrete_col

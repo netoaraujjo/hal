@@ -31,12 +31,11 @@ class EWD(object):
         minimo = min(col)
         largura = (maximo - minimo) / self.n_tracks
 
-        # print('min: ', min(col), 'max: ', max(col), 'largura: ', largura)
-
-        edges = []
+        edges = [minimo]
         for cut_point in range(1, self.n_tracks):
             edges.append(minimo + cut_point * largura)
 
+        edges.append(maximo)
         return edges
 
 
@@ -47,12 +46,18 @@ class EWD(object):
         discrete_col = []
 
         for index, value in enumerate(col):
-            for n, edge in enumerate(edges):
+            for n, edge in enumerate(edges[1:len(edges)-1]):
                 if value <= edge:
                     discrete_col.append(n+1)
                     break
 
             if len(discrete_col) == index:
                 discrete_col.append(self.n_tracks)
+
+        # for index, value in enumerate(col):
+        #     for n in range(1,len(edges)):
+        #         if value <= edges[n]:
+        #             discrete_col.append(n)
+        #             break
 
         return discrete_col

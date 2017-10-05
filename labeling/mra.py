@@ -10,16 +10,20 @@ class MRA(object):
 		self.clusters = clusters
 		self.attributes = attributes
 		self.variacao = variacao
+		self.relevancies = {}
+		self.labels = {}
 	
 
 	def execute(self):
+
 		# percorre cada cluster
 		for cluster in self.clusters:
-			print('Avaliando cluster %s' % cluster)
+			relevance = {} # Armazena a relevância de cada atributo para o cluster atual
+
+			# print('Cluster %s | Qtd. elementos: %d' % (cluster, len(self.clusters[cluster])))
 
 			# percorre cada um dos atributos
 			for col, attribute in enumerate(self.attributes):
-				print('Avaliando atributo %s' % attribute)
 
 				# 60% dos elementos para treino
 				qtd_elementos_treino = round(len(self.clusters[cluster]) * 0.6)
@@ -27,24 +31,52 @@ class MRA(object):
 				dados_treino = self.clusters[cluster][:qtd_elementos_treino,:]
 				dados_teste = self.clusters[cluster][qtd_elementos_treino:,:]
 
+				# separa o atributo avaliado dos dados de treino
 				X_treino = np.hstack((dados_treino[:, :col], dados_treino[:, col+1:]))
 				y_treino = dados_treino[:, col]
 
+				# separa o atributo avaliado dos dados de teste
 				X_teste = np.hstack((dados_teste[:, :col], dados_teste[:, col+1:]))
 				y_teste = dados_teste[:, col]
-				# y_teste = y_teste.reshape(len(y_teste),1)
 
-				# print(X_treino, X_treino.ndim, len(X_treino))
-				# print(y_treino, y_treino.ndim, len(y_treino))
-
-				mlp = MLPClassifier(hidden_layer_sizes = (10,))
+				mlp = MLPClassifier(hidden_layer_sizes = (10,), max_iter = 2000)
 				mlp.fit(X_treino, y_treino)
-				# print("score treino: %f" % mlp.score(X_treino, y_treino))
-				# print("score teste %f" % mlp.score(X_teste, y_teste))
 
 				predictions = mlp.predict(X_teste)
-				print(predictions)
 
-				print(confusion_matrix(y_teste, predictions))
-				print(classification_report(y_teste, predictions))
-				print(accuracy_score(y_teste, predictions))
+				relevance[attribute] = accuracy_score(y_teste, predictions) * 100
+				self.relevancies[cluster] = relevance
+
+		print(self.relevancies)
+		print()
+
+
+		self.select_attributes()
+
+
+	def select_attributes(self):
+		"""Seleciona os atributos de acordo com o parâmetro de variação"""
+		for cluster, relevance in self.relevancies.items():
+			label = {}
+			maximo = max(relevance.values())
+			for attr, rel in relevance.items():
+				if rel >= maximo - self.variacao:
+					label[attr] = rel
+			self.labels[cluster] = label
+
+		print(self.labels)
+		print()
+		self.calc_tracks()
+
+
+
+	def calc_tracks(self):
+		for cluster in self.clusters:
+			for attr_index in len(self.attributes):
+				pass
+
+
+
+	def calc_accuracy(self):
+		"""Calcula a acuracia da rotulação"""
+		pass

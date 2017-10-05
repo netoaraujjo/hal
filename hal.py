@@ -13,17 +13,17 @@ def main(argv):
 	dataset = IOManager.read_file(argv[1], True)
 	dataset['data'] = np.array(dataset['data'])
 
-	print(dataset['data'])
-	print('shape:', dataset['data'].shape)
-	print('ndim: ', dataset['data'].ndim)
+	# print(dataset['data'])
+	# print('shape:', dataset['data'].shape)
+	# print('ndim: ', dataset['data'].ndim)
 
 	# Discretizar dados
 	dataset['discretized_data'] = EWD(dataset['data'], 3).discretize()
-	print(dataset['discretized_data'])
+	# print(dataset['discretized_data'])
 
 
 	# Executa o KMeans para agrupamento
-	kmeans = KMeans(n_clusters = 3, ).fit(dataset['data'])
+	kmeans = KMeans(n_clusters = 3).fit(dataset['data'])
 
 
 	# Constrói os grupos em dicionários, sendo os índices dos grupos as chaves do dicionário

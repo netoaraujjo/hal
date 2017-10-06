@@ -9,7 +9,7 @@ class EWD(object):
         self.n_tracks = n_tracks
         self.n_elements = len(self.data)
         self.n_attrs = len(self.data[0])
-
+        self.edges = []
 
 
     def discretize(self):
@@ -17,10 +17,10 @@ class EWD(object):
 
         for attr_index in range(self.n_attrs):
             edges = self.__calc_edges(attr_index)
+            self.edges.append(edges)
             discrete_data.append(self.__fit(attr_index, edges))
 
-        return np.transpose(np.array(discrete_data))
-            
+        self.discrete_data = np.transpose(np.array(discrete_data))            
 
 
     def __calc_edges(self, attr_index):
@@ -54,10 +54,13 @@ class EWD(object):
             if len(discrete_col) == index:
                 discrete_col.append(self.n_tracks)
 
-        # for index, value in enumerate(col):
-        #     for n in range(1,len(edges)):
-        #         if value <= edges[n]:
-        #             discrete_col.append(n)
-        #             break
-
         return discrete_col
+
+    
+    @property
+    def discrete_data_(self):
+        return self.discrete_data
+
+    @property
+    def edges_(self):
+        return self.edges

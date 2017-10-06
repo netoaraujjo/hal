@@ -5,11 +5,12 @@ import numpy as np
 
 class MRA(object):
 	"""docstring for MRA"""
-	def __init__(self, clusters, attributes, variacao):
+	def __init__(self, clusters, attributes, variacao, edges):
 		super(MRA, self).__init__()
 		self.clusters = clusters
 		self.attributes = attributes
 		self.variacao = variacao
+		self.edges = edges
 		self.relevancies = {}
 		self.labels = {}
 	
@@ -47,34 +48,45 @@ class MRA(object):
 				relevance[attribute] = accuracy_score(y_teste, predictions) * 100
 				self.relevancies[cluster] = relevance
 
-		print(self.relevancies)
-		print()
-
-
-		self.select_attributes()
+		most_rel = self.select_attributes()
+		self.calc_frequency(most_rel)
 
 
 	def select_attributes(self):
-		"""Seleciona os atributos de acordo com o parâmetro de variação"""
+		"""Seleciona os atributos mais relevantes de acordo com o parâmetro de variação"""
+		most_rel = {}
 		for cluster, relevance in self.relevancies.items():
-			label = {}
+			most_rel_attr = {} # atributos mais relevantes para o cluster atual
 			maximo = max(relevance.values())
 			for attr, rel in relevance.items():
 				if rel >= maximo - self.variacao:
-					label[attr] = rel
-			self.labels[cluster] = label
+					most_rel_attr[attr] = rel
+			most_rel[cluster] = most_rel_attr
 
-		print(self.labels)
-		print()
-		self.calc_tracks()
-
+		print(most_rel)
+		return most_rel
 
 
-	def calc_tracks(self):
-		for cluster in self.clusters:
-			for attr_index in len(self.attributes):
-				pass
 
+	def calc_frequency(self, most_rel):
+		# print(self.clusters)
+		most_freq = {}
+		for cluster, rel_attr in most_rel.items():
+			most_freq_value = {}
+			for attr in rel_attr.keys():
+				attr_index = self.attributes.index(attr) # indice da coluna com valores do atributo
+				values = (list(self.clusters[cluster][:,attr_index]))
+				unique_values = list(set(values))
+				frequency = []
+				for value in unique_values:
+					frequency.append(values.count(value))
+
+				most_freq_value[attr] = unique_values[frequency.index(max(frequency))]
+
+			most_freq[cluster] = most_freq_value
+
+		print(most_freq)
+		return most_freq
 
 
 	def calc_accuracy(self):

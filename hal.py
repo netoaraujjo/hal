@@ -13,13 +13,10 @@ def main(argv):
 	dataset = IOManager.read_file(argv[1], True)
 	dataset['data'] = np.array(dataset['data'])
 
-	# print(dataset['data'])
-	# print('shape:', dataset['data'].shape)
-	# print('ndim: ', dataset['data'].ndim)
 
 	# Discretizar dados
-	dataset['discretized_data'] = EWD(dataset['data'], 3).discretize()
-	# print(dataset['discretized_data'])
+	ewd = EWD(dataset['data'], 3)
+	ewd.discretize()
 
 
 	# Executa o KMeans para agrupamento
@@ -32,13 +29,13 @@ def main(argv):
 		cluster_index = str(kmeans.labels_[c])
 
 		if cluster_index in clusters.keys():
-			clusters[cluster_index] = np.vstack((clusters[cluster_index], dataset['discretized_data'][c]))
+			clusters[cluster_index] = np.vstack((clusters[cluster_index], ewd.discrete_data_[c]))
 		else:
-			clusters[cluster_index] = np.array(dataset['discretized_data'][c])
+			clusters[cluster_index] = np.array(ewd.discrete_data_[c])
 
 
 	# Executa o MLP para rotulação
-	mra = MRA(clusters, dataset['attributes'], 5).execute()
+	mra = MRA(clusters, dataset['attributes'], 5, ewd.edges_).execute()
 
 if __name__ == '__main__':
 	main(sys.argv)

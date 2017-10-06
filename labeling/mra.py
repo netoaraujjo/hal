@@ -49,7 +49,18 @@ class MRA(object):
 				self.relevancies[cluster] = relevance
 
 		most_rel = self.select_attributes()
-		self.calc_frequency(most_rel)
+		most_freq = self.calc_frequency(most_rel)
+		self.calc_label(most_freq)
+
+		print(most_rel)
+		print()
+		print(most_freq)
+		print()
+		print(self.edges)
+		print()
+
+		print(self.labels)
+
 
 
 	def select_attributes(self):
@@ -63,7 +74,6 @@ class MRA(object):
 					most_rel_attr[attr] = rel
 			most_rel[cluster] = most_rel_attr
 
-		print(most_rel)
 		return most_rel
 
 
@@ -85,8 +95,18 @@ class MRA(object):
 
 			most_freq[cluster] = most_freq_value
 
-		print(most_freq)
 		return most_freq
+
+
+
+	def calc_label(self, most_freq):
+		for cluster, attrs in most_freq.items():
+			label = {}
+			for attr, track in attrs.items():
+				edge = self.edges[self.attributes.index(attr)]
+				label[attr] = (edge[track-1], edge[track])
+
+			self.labels[cluster] = label
 
 
 	def calc_accuracy(self):

@@ -5,17 +5,17 @@ import numpy as np
 
 class MRA(object):
 	"""docstring for MRA"""
-	def __init__(self, clusters, attributes, variacao, edges):
+	def __init__(self, original_clusters, clusters, attributes, variacao, edges):
 		super(MRA, self).__init__()
+		self.original_clusters = original_clusters
 		self.clusters = clusters
 		self.attributes = attributes
 		self.variacao = variacao
 		self.edges = edges
-		self.relevancies = {}
-		self.labels = {}
 	
 
 	def execute(self):
+		self.relevancies = {}
 
 		# percorre cada cluster
 		for cluster in self.clusters:
@@ -51,15 +51,18 @@ class MRA(object):
 		most_rel = self.select_attributes()
 		most_freq = self.calc_frequency(most_rel)
 		self.calc_label(most_freq)
+		self.calc_accuracy()
 
-		print(most_rel)
-		print()
-		print(most_freq)
-		print()
-		print(self.edges)
-		print()
+		# print(most_rel)
+		# print()
+		# print(most_freq)
+		# print()
+		# print(self.edges)
+		# print()
+		# print(self.labels)
+		# print(self.accuracy)
 
-		print(self.labels)
+		self.report()
 
 
 
@@ -100,6 +103,8 @@ class MRA(object):
 
 
 	def calc_label(self, most_freq):
+		self.labels = {}
+
 		for cluster, attrs in most_freq.items():
 			label = {}
 			for attr, track in attrs.items():
@@ -111,4 +116,53 @@ class MRA(object):
 
 	def calc_accuracy(self):
 		"""Calcula a acuracia da rotulação"""
-		pass
+		# print(self.original_clusters)
+
+		self.accuracy = {}
+		
+		for cluster, attrs in self.labels.items():
+			cluster_accuracy = {}
+			acerto_cluster = 0
+
+			for element in self.original_clusters[cluster]:
+				correto = True
+
+				for attr, interval in attrs.items():
+					attr_index = self.attributes.index(attr)
+
+					if interval[0] <= element[attr_index] <= interval[1]:
+						if attr in cluster_accuracy.keys():
+							cluster_accuracy[attr] += 1
+						else:
+							cluster_accuracy[attr] = 1
+					else:
+						correto = False
+
+				if correto:
+					acerto_cluster += 1
+
+			cluster_accuracy['total'] = acerto_cluster
+
+			self.accuracy[cluster] = cluster_accuracy
+
+
+	def report(self):
+		clusters = list(self.labels.keys())
+		clusters.sort()
+		general_accuracy = 0
+		n_elements = 0
+		
+		for cluster in clusters:
+			print('Cluster:', cluster)
+
+			for attr, interval in self.labels[cluster].items():
+				accuracy = (self.accuracy[cluster][attr] / len(self.clusters[cluster])) * 100
+				print("  %s: %.4f ~ %.4f | %.2f%% (%d/%d)" % (attr, interval[0], interval[1], accuracy, self.accuracy[cluster][attr], len(self.clusters[cluster])))
+
+			acuracia_total = self.accuracy[cluster]['total'] / len(self.clusters[cluster]) * 100
+			print("  Acerto total: %.2f%% (%d/%d)\n" % (acuracia_total, self.accuracy[cluster]['total'], len(self.clusters[cluster])))
+
+			general_accuracy += self.accuracy[cluster]['total']
+			n_elements += len(self.clusters[cluster])
+
+		print("Acuracia geral: %.2f%% (%d/%d)\n" % ((general_accuracy/n_elements) * 100, general_accuracy, n_elements))

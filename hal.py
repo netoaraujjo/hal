@@ -25,17 +25,20 @@ def main(argv):
 
 	# Constrói os grupos em dicionários, sendo os índices dos grupos as chaves do dicionário
 	clusters = {}
+	original_clusters = {} # armazena os clusters com valores originais
 	for c in range(len(kmeans.labels_)):
 		cluster_index = str(kmeans.labels_[c])
 
 		if cluster_index in clusters.keys():
 			clusters[cluster_index] = np.vstack((clusters[cluster_index], ewd.discrete_data_[c]))
+			original_clusters[cluster_index] = np.vstack((original_clusters[cluster_index], dataset['data'][c]))
 		else:
 			clusters[cluster_index] = np.array(ewd.discrete_data_[c])
+			original_clusters[cluster_index] = dataset['data'][c]
 
 
 	# Executa o MLP para rotulação
-	mra = MRA(clusters, dataset['attributes'], 5, ewd.edges_).execute()
+	mra = MRA(original_clusters, clusters, dataset['attributes'], 5, ewd.edges_).execute()
 
 if __name__ == '__main__':
 	main(sys.argv)

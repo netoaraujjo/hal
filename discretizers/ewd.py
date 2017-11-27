@@ -13,6 +13,7 @@ class EWD(object):
 
 
     def discretize(self):
+        """Inicia o processo de discretizacao."""
         discrete_data = []
 
         for attr_index in range(self.n_attrs):
@@ -20,11 +21,15 @@ class EWD(object):
             self.edges.append(edges)
             discrete_data.append(self.__fit(attr_index, edges))
 
-        self.discrete_data = np.transpose(np.array(discrete_data))            
+        # Armazena os dados discretizados
+        self.discrete_data = np.transpose(np.array(discrete_data))
 
 
     def __calc_edges(self, attr_index):
-        """Calcula os pontos de corte. Recebe o índice da coluna a ser discretizada"""
+        """Calcula os pontos de corte. Recebe o índice da coluna a ser
+        discretizada.
+        attr_index eh o indice da coluna (atributo)
+        """
         col = self.data[:,attr_index]
 
         maximo = max(col)
@@ -36,11 +41,20 @@ class EWD(object):
             edges.append(minimo + cut_point * largura)
 
         edges.append(maximo)
+
+        # Retorna uma lista contendo os pontos de corte do intervalo de valores
+        # do atributo
         return edges
 
 
 
     def __fit(self, attr_index, edges):
+        """Calcula os valores discretos para todos os elementos em um dado
+        atributo.
+        attr_index eh o indice da coluna (atributo) cujos valores serão
+        discretizados.
+        edges sao os pontos de corte para o atributo a ser discretizado.
+        """
         col = self.data[:,attr_index]
 
         discrete_col = []
@@ -54,13 +68,16 @@ class EWD(object):
             if len(discrete_col) == index:
                 discrete_col.append(self.n_tracks)
 
+        # Retorna a coluna (atributos) com valores discretos
         return discrete_col
 
-    
+
     @property
     def discrete_data_(self):
+        """Retorna os dados discretizados"""
         return self.discrete_data
 
     @property
     def edges_(self):
+        """Retorna os pontos de corte dos atributos"""
         return self.edges

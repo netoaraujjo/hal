@@ -147,22 +147,23 @@ class MRA(object):
 
 
 	def report(self):
+		""""""
 		clusters = list(self.labels.keys())
 		clusters.sort()
 		general_accuracy = 0
 		n_elements = 0
 		
 		for cluster in clusters:
-			print('Cluster:', cluster)
+			print(' Cluster:', cluster)
 
 			for attr, interval in self.labels[cluster].items():
 				accuracy = (self.accuracy[cluster][attr] / len(self.clusters[cluster])) * 100
-				print("  %s: %.4f ~ %.4f | %.2f%% (%d/%d)" % (attr, interval[0], interval[1], accuracy, self.accuracy[cluster][attr], len(self.clusters[cluster])))
+				print("   %s: %.4f ~ %.4f | %.2f%% (%d/%d)" % (attr, interval[0], interval[1], accuracy, self.accuracy[cluster][attr], len(self.clusters[cluster])))
 
 			acuracia_total = self.accuracy[cluster]['total'] / len(self.clusters[cluster]) * 100
-			print("  Acerto total: %.2f%% (%d/%d)\n" % (acuracia_total, self.accuracy[cluster]['total'], len(self.clusters[cluster])))
+			print("   Acerto total: %.2f%% (%d/%d)\n" % (acuracia_total, self.accuracy[cluster]['total'], len(self.clusters[cluster])))
 
 			general_accuracy += self.accuracy[cluster]['total']
 			n_elements += len(self.clusters[cluster])
 
-		print("Acuracia geral: %.2f%% (%d/%d)\n" % ((general_accuracy/n_elements) * 100, general_accuracy, n_elements))
+		print(" Acuracia geral: %.2f%% (%d/%d)\n" % ((general_accuracy/n_elements) * 100, general_accuracy, n_elements))

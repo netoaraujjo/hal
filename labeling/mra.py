@@ -7,12 +7,12 @@ class MRA(object):
 	"""docstring for MRA"""
 	def __init__(self, original_clusters, clusters, attributes, variacao, edges):
 		super(MRA, self).__init__()
-		self.original_clusters = original_clusters
-		self.clusters = clusters
-		self.attributes = attributes
+		self.original_clusters = original_clusters # clusters com valores continuos
+		self.clusters = clusters # clusters com valores discretos
+		self.attributes = [attr for attr in attributes]
 		self.variacao = variacao
 		self.edges = edges
-	
+
 
 	def execute(self):
 		self.relevancies = {}
@@ -28,7 +28,7 @@ class MRA(object):
 
 				# 60% dos elementos para treino
 				qtd_elementos_treino = round(len(self.clusters[cluster]) * 0.6)
-				
+
 				dados_treino = self.clusters[cluster][:qtd_elementos_treino,:]
 				dados_teste = self.clusters[cluster][qtd_elementos_treino:,:]
 
@@ -119,7 +119,7 @@ class MRA(object):
 		# print(self.original_clusters)
 
 		self.accuracy = {}
-		
+
 		for cluster, attrs in self.labels.items():
 			cluster_accuracy = {}
 			acerto_cluster = 0
@@ -152,7 +152,7 @@ class MRA(object):
 		clusters.sort()
 		general_accuracy = 0
 		n_elements = 0
-		
+
 		for cluster in clusters:
 			print(' Cluster:', cluster)
 

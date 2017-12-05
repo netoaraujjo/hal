@@ -6,6 +6,7 @@ import numpy as np
 from sklearn.cluster import KMeans
 from labeling.mra import MRA
 from discretizers.ewd import EWD
+from clustering.kmeans import KMeans
 
 def main(argv):
 	# print('Bem vindo ao projeto HAL!\n')
@@ -14,37 +15,25 @@ def main(argv):
 	data = io.read_file(argv[1])
 	print(data.describe())
 
+	# Executa o KMeans para agrupamento
+	clustering = KMeans(3, 'random', 30, data.values)
+	clustering.execute()
+
 	# Discretizar dados
 	ewd = EWD(data.values, 3)
 	ewd.discretize()
 
-
-	# Executa o KMeans para agrupamento
-	kmeans = KMeans(n_clusters = 3, init = 'random', n_init = 30).fit(data.values)
-	print(kmeans.labels_)
-
-	#####################################################
-	# Comum para todos os alforitmos de agrupamento
-	#####################################################
-
-	# Constrói os grupos em dicionários, sendo os índices dos grupos as chaves do dicionário
-	clusters = {}
-	original_clusters = {} # armazena os clusters com valores originais
-	for c in range(len(kmeans.labels_)):
-		cluster_index = str(kmeans.labels_[c])
-		if cluster_index in clusters.keys():
-			clusters[cluster_index] = np.vstack((clusters[cluster_index], ewd.discrete_data_[c]))
-			original_clusters[cluster_index] = np.vstack((original_clusters[cluster_index], data.values[c]))
+	# Constroi os grupos em dicionarios, sendo os indices dos grupos as chaves do dicionario
+	discrete_clusters = {} # armazena os clusters com valores originais
+	for c in range(len(clustering.labels_)):
+		cluster_index = str(clustering.labels_[c])
+		if cluster_index in discrete_clusters.keys():
+			discrete_clusters[cluster_index] = np.vstack((discrete_clusters[cluster_index], ewd.discrete_data_[c]))
 		else:
-			clusters[cluster_index] = np.array(ewd.discrete_data_[c])
-			original_clusters[cluster_index] = data.values[c]
+			discrete_clusters[cluster_index] = np.array(ewd.discrete_data_[c])
 
-	#####################################################
-
-	
-
-	# Executa o MLP para rotulação
-	# mra = MRA(original_clusters, clusters, dataset['attributes'], 5, ewd.edges_).execute()
+	# Executa o MLP para rotulacao
+	mra = MRA(clustering.clusters_, discrete_clusters, data.columns, 5, ewd.edges_).execute()
 
 if __name__ == '__main__':
 	main(sys.argv)

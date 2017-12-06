@@ -1,18 +1,20 @@
 # -*- coding: utf-8 -*-
+from .discretization import Discretization
 import numpy as np
 
-class EWD(object):
+class EWD(Discretization):
     """docstring for EWD"""
     def __init__(self, data, n_tracks):
         super(EWD, self).__init__()
         self.data = data
         self.n_tracks = n_tracks
+        # self.labels = labels
         self.n_elements = len(self.data)
         self.n_attrs = len(self.data[0])
         self.edges = []
 
 
-    def discretize(self):
+    def discretize(self, labels):
         """Inicia o processo de discretizacao."""
         discrete_data = []
 
@@ -23,6 +25,8 @@ class EWD(object):
 
         # Armazena os dados discretizados
         self.discrete_data = np.transpose(np.array(discrete_data))
+
+        self.discrete_clusters = super().make_discrete_clusters(self.discrete_data, labels)
 
 
     def __calc_edges(self, attr_index):
@@ -74,10 +78,15 @@ class EWD(object):
 
     @property
     def discrete_data_(self):
-        """Retorna os dados discretizados"""
+        """Retorna os dados discretizados."""
         return self.discrete_data
 
     @property
     def edges_(self):
-        """Retorna os pontos de corte dos atributos"""
+        """Retorna os pontos de corte dos atributos."""
         return self.edges
+
+    @property
+    def discrete_clusters_(self):
+        """Retorna os clusters com valores discretos."""
+        return self.discrete_clusters

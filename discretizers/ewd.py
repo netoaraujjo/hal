@@ -8,7 +8,6 @@ class EWD(Discretization):
         super(EWD, self).__init__()
         self.data = data
         self.n_tracks = n_tracks
-        # self.labels = labels
         self.n_elements = len(self.data)
         self.n_attrs = len(self.data[0])
         self.edges = []

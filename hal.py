@@ -11,6 +11,7 @@ from clustering.kmeans import KMeans
 def main(argv):
 	# print('Bem vindo ao projeto HAL!\n')
 
+    # Le arquivo de entrada
 	io = IOManager2()
 	data = io.read_file(argv[1])
 	print(" ESTATISTICAS")
@@ -25,8 +26,10 @@ def main(argv):
 	ewd.discretize(clustering.labels_)
 
 	# Executa o MLP para rotulacao
-	mra = MRA(clustering.clusters_, ewd.discrete_clusters_, data.columns, 5,
-			  ewd.edges_).execute()
+	mra = MRA(clustering.clusters_, ewd.discrete_clusters_, len(data), data.columns, 5,
+			  ewd.edges_)
+	mra.execute()
+	print(mra.report_)
 
 if __name__ == '__main__':
 	main(sys.argv)

@@ -6,10 +6,11 @@ import numpy as np
 
 class MRA(Labeling):
 	"""docstring for MRA"""
-	def __init__(self, original_clusters, clusters, attributes, variacao, edges):
+	def __init__(self, original_clusters, clusters, n_elements, attributes, variacao, edges):
 		super(MRA, self).__init__()
 		self.original_clusters = original_clusters # clusters com valores continuos
 		self.clusters = clusters # clusters com valores discretos
+		self.n_elements = n_elements
 		self.attributes = [attr for attr in attributes]
 		self.variacao = variacao
 		self.edges = edges
@@ -50,17 +51,12 @@ class MRA(Labeling):
 		self.most_rel = self.select_attributes()
 		self.most_freq = self.calc_frequency()
 		self.calc_label()
-		self.calc_accuracy()
+		self.calc_hit()
 
-		# print("most_freq: valores mais frequentes dos atributos mais relevantes\n", self.most_freq)
+		# print("self.hit: quantidade de acertos de cada atributo\n", self.hit)
 		# print()
-		# print("self.labels: rotulos dos clusters\n", self.labels)
-		# print()
-		# print("self.accuracy: quantidade de acertos de cada atributo\n", self.accuracy)
 
 		self.make_report()
-		print(self.report_)
-
 
 
 	def select_attributes(self):
@@ -75,7 +71,6 @@ class MRA(Labeling):
 			most_rel[cluster] = most_rel_attr
 
 		return most_rel
-
 
 
 	def calc_frequency(self):
@@ -98,7 +93,6 @@ class MRA(Labeling):
 		return most_freq
 
 
-
 	def calc_label(self):
 		self.labels = {}
 
@@ -111,16 +105,20 @@ class MRA(Labeling):
 			self.labels[cluster] = label
 
 
-	def calc_accuracy(self):
+	def calc_hit(self):
 		"""
 		Calcula a quantidade de elementos que obedecem aos valores dos
 		atributos para cada cluster
 		"""
-		self.accuracy = {}
+		# contem o numero de acertos do rotulo para cada atributo e o total de cada cluster
+		self.hit = {}
+		self.total_hit = 0
+		# self.accuracy = {}
 
 		for cluster, attrs in self.labels.items():
-			cluster_accuracy = {}
-			acerto_cluster = 0
+			cluster_hit = {}
+			# cluster_accuracy = {}
+			total_cluster_hit = 0
 
 			for element in self.original_clusters[cluster]:
 				correto = True
@@ -129,65 +127,81 @@ class MRA(Labeling):
 					attr_index = self.attributes.index(attr)
 
 					if interval[0] <= element[attr_index] <= interval[1]:
-						if attr in cluster_accuracy.keys():
-							cluster_accuracy[attr] += 1
+						if attr in cluster_hit.keys():
+							cluster_hit[attr] += 1
 						else:
-							cluster_accuracy[attr] = 1
+							cluster_hit[attr] = 1
 					else:
 						correto = False
 
 				if correto:
-					acerto_cluster += 1
+					total_cluster_hit += 1
 
-			cluster_accuracy['total'] = acerto_cluster
+			cluster_hit['cluster_hit'] = total_cluster_hit
+			self.total_hit += total_cluster_hit # acerto total da rotulacao
 
-			self.accuracy[cluster] = cluster_accuracy
+			self.hit[cluster] = cluster_hit # acerto do cluster
 
 
 	def make_report(self):
 		"""Monta o relatorio com o resultado."""
 		clusters = list(self.labels.keys())
 		clusters.sort()
-		general_accuracy = 0 # quantidade de elementos que obedece a todos os intervalos de valores do rotulo
 		n_elements = 0
 
 		self.report = ""
 
+		# Adiciona a relevancia de todos os atributos ao relatorio
 		self.report += "Relevancia de todos os atributos:\n"
 		for cluster in clusters:
 			self.report += " Cluster: " + cluster + "\n"
 			for attr, relevance in self.relevancies[cluster].items():
 				self.report += ("   %s: %.2f%%\n" % (attr, relevance))
-
 			self.report += "\n"
 
+
+		# Adiciona os atributos mais relevantes, de acordo coom a variacao,
+		# ao relatorio
 		self.report += ("Atributos mais relevantes (Variacao = %d):\n" % self.variacao)
 		for cluster in clusters:
 			self.report += " Cluster: " + cluster + "\n"
 			for attr, relevance in self.most_rel[cluster].items():
 				self.report += ("   %s: %.2f%%\n" % (attr, relevance))
-
 			self.report += "\n"
 
+
+		# Adiciona os rotulos ao relatorio
 		self.report += "Rotulos:\n"
 		for cluster in clusters:
 			self.report += " Cluster: " + cluster + "\n"
 
 			for attr, interval in self.labels[cluster].items():
-				accuracy = (self.accuracy[cluster][attr] / len(self.clusters[cluster])) * 100
+				accuracy = (self.hit[cluster][attr] / len(self.clusters[cluster])) * 100
 				bracket = "[" if self.most_freq[cluster][attr] == 1 else "]"
-				self.report += ("   %s: %s%.4f , %.4f] | %.2f%% (%d/%d)\n" % (attr,  bracket, interval[0], interval[1], accuracy, self.accuracy[cluster][attr], len(self.clusters[cluster])))
+				self.report += ("   %s: %s%.4f , %.4f] | %.2f%% (%d/%d)\n" % (attr,
+																			  bracket,
+																			  interval[0],
+																			  interval[1],
+																			  accuracy,
+																			  self.hit[cluster][attr],
+																			  len(self.clusters[cluster])))
 
-			acuracia_total = self.accuracy[cluster]['total'] / len(self.clusters[cluster]) * 100
-			self.report += ("   Acerto total: %.2f%% (%d/%d)\n\n" % (acuracia_total, self.accuracy[cluster]['total'], len(self.clusters[cluster])))
+			cluster_accuracy = self.hit[cluster]['cluster_hit'] / len(self.clusters[cluster]) * 100
+			self.report += ("   Acerto total: %.2f%% (%d/%d)\n\n" % (cluster_accuracy,
+																	 self.hit[cluster]['cluster_hit'],
+																	 len(self.clusters[cluster])))
 
-			general_accuracy += self.accuracy[cluster]['total']
-			n_elements += len(self.clusters[cluster])
-
-		self.report += (" Acuracia geral: %.2f%% (%d/%d)\n" % ((general_accuracy/n_elements) * 100, general_accuracy, n_elements))
+		self.report += (" Acuracia geral: %.2f%% (%d/%d)\n" % (self.total_accuracy_,
+															   self.total_hit,
+															   self.n_elements))
 
 
 	@property
 	def report_(self):
 		"""Retorna o texto do ralatorio."""
 		return self.report
+
+
+	@property
+	def total_accuracy_(self):
+		return (self.total_hit / self.n_elements) * 100

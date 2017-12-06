@@ -21,3 +21,9 @@ class Labeling(ABC):
     @abstractmethod
     def report_(self):
         pass
+
+
+    @property
+    @abstractmethod
+    def total_accuracy_(self):
+        pass

@@ -19,7 +19,7 @@ def main(argv):
 	print(data.describe())
 
 	# Executa o KMeans para agrupamento
-	clustering = KMeans(3, 'random', 30, data.values)
+	clustering = KMeans(data.values, n_clusters = 3, init = 'random', n_init = 30, max_iter = 1000)
 	clustering.execute()
 
 	# Discretizar dados

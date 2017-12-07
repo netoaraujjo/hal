@@ -6,11 +6,13 @@ import numpy as np
 from labeling.mra import MRA
 from discretizers.ewd import EWD
 from discretizers.efd import EFD
-from clustering.kmeans import KMeans
-from clustering.birch import Birch
-from clustering.dbscan import DBSCAN
-from clustering.mean_shift import MeanShift
-from clustering.affinity_propagation import AffinityPropagation
+from clustering import KMeans
+from clustering import Birch
+from clustering import DBSCAN
+from clustering import MeanShift
+from clustering import AffinityPropagation
+from clustering import AgglomerativeClustering
+
 
 def main(argv):
 	# print('Bem vindo ao projeto HAL!\n')
@@ -22,11 +24,12 @@ def main(argv):
 	print(data.describe())
 
 	# Executa o KMeans para agrupamento
-	# clustering = KMeans(data.values, n_clusters = 3, init = 'random', n_init = 30, max_iter = 1000)
+	clustering = KMeans(data.values, n_clusters = 3, init = 'random', n_init = 30, max_iter = 1000)
 	# clustering = Birch(data.values, n_clusters = None)
 	# clustering = DBSCAN(data.values)
 	# clustering = MeanShift(data.values)
-	clustering = AffinityPropagation(data.values)
+	# clustering = AffinityPropagation(data.values)
+	# clustering = AgglomerativeClustering(data.values, n_clusters = 3)
 	clustering.execute()
 
 	# Discretizar dados

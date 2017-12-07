@@ -3,12 +3,12 @@
 import sys
 from iomanager2 import IOManager2
 import numpy as np
-from sklearn.cluster import KMeans
 from labeling.mra import MRA
 from discretizers.ewd import EWD
 from discretizers.efd import EFD
 from clustering.kmeans import KMeans
 from clustering.birch import Birch
+from clustering.dbscan import DBSCAN
 
 def main(argv):
 	# print('Bem vindo ao projeto HAL!\n')
@@ -21,7 +21,8 @@ def main(argv):
 
 	# Executa o KMeans para agrupamento
 	# clustering = KMeans(data.values, n_clusters = 3, init = 'random', n_init = 30, max_iter = 1000)
-	clustering = Birch(data.values, n_clusters = None)
+	# clustering = Birch(data.values, n_clusters = None)
+	clustering = DBSCAN(data.values)
 	clustering.execute()
 
 	# Discretizar dados

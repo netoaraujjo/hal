@@ -7,6 +7,15 @@ class Discretization(ABC):
     def __init__(self):
         super(Discretization, self).__init__()
 
+
+    @abstractmethod
+    def calc_edges(self, attr_index):
+        """Calcula os pontos de corte. Recebe o índice da coluna a ser
+        discretizada.
+        attr_index eh o indice da coluna (atributo)
+        """
+        pass
+
     @property
     @abstractmethod
     def discrete_data_(self):
@@ -38,3 +47,27 @@ class Discretization(ABC):
                 discrete_clusters[cluster_index] = np.array(discrete_data[c])
 
         return discrete_clusters
+
+
+    def fit(self, data, n_tracks, attr_index, edges):
+        """Calcula os valores discretos para todos os elementos em um dado
+        atributo.
+        attr_index eh o indice da coluna (atributo) cujos valores serão
+        discretizados.
+        edges sao os pontos de corte para o atributo a ser discretizado.
+        """
+        col = self.data[:,attr_index]
+
+        discrete_col = []
+
+        for index, value in enumerate(col):
+            for n, edge in enumerate(edges[1:len(edges)-1]):
+                if value <= edge:
+                    discrete_col.append(n+1)
+                    break
+
+            if len(discrete_col) == index:
+                discrete_col.append(self.n_tracks)
+
+        # Retorna a coluna (atributos) com valores discretos
+        return discrete_col

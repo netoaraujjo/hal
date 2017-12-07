@@ -18,9 +18,9 @@ class EWD(Discretization):
         discrete_data = []
 
         for attr_index in range(self.n_attrs):
-            edges = self.__calc_edges(attr_index)
+            edges = self.calc_edges(attr_index)
             self.edges.append(edges)
-            discrete_data.append(self.__fit(attr_index, edges))
+            discrete_data.append(super().fit(self.data, self.n_tracks, attr_index, edges))
 
         # Armazena os dados discretizados
         self.discrete_data = np.transpose(np.array(discrete_data))
@@ -28,7 +28,7 @@ class EWD(Discretization):
         self.discrete_clusters = super().make_discrete_clusters(self.discrete_data, labels)
 
 
-    def __calc_edges(self, attr_index):
+    def calc_edges(self, attr_index):
         """Calcula os pontos de corte. Recebe o índice da coluna a ser
         discretizada.
         attr_index eh o indice da coluna (atributo)
@@ -48,31 +48,6 @@ class EWD(Discretization):
         # Retorna uma lista contendo os pontos de corte do intervalo de valores
         # do atributo
         return edges
-
-
-
-    def __fit(self, attr_index, edges):
-        """Calcula os valores discretos para todos os elementos em um dado
-        atributo.
-        attr_index eh o indice da coluna (atributo) cujos valores serão
-        discretizados.
-        edges sao os pontos de corte para o atributo a ser discretizado.
-        """
-        col = self.data[:,attr_index]
-
-        discrete_col = []
-
-        for index, value in enumerate(col):
-            for n, edge in enumerate(edges[1:len(edges)-1]):
-                if value <= edge:
-                    discrete_col.append(n+1)
-                    break
-
-            if len(discrete_col) == index:
-                discrete_col.append(self.n_tracks)
-
-        # Retorna a coluna (atributos) com valores discretos
-        return discrete_col
 
 
     @property

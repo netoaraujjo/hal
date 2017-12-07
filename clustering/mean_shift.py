@@ -6,7 +6,7 @@ class MeanShift(Clustering):
     """docstring for MeanShift."""
     def __init__(self, data, bandwidth = None, seeds = None, bin_seeding = False,
                  min_bin_freq = 1, cluster_all = True, n_jobs = 1):
-        super(MeanShift, self).__init__()
+        super(Clustering, self).__init__()
         self.data = data
         self.bandwidth = bandwidth
         self.seeds = seeds

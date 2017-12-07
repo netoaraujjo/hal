@@ -10,6 +10,7 @@ from clustering.kmeans import KMeans
 from clustering.birch import Birch
 from clustering.dbscan import DBSCAN
 from clustering.mean_shift import MeanShift
+from clustering.affinity_propagation import AffinityPropagation
 
 def main(argv):
 	# print('Bem vindo ao projeto HAL!\n')
@@ -24,7 +25,8 @@ def main(argv):
 	# clustering = KMeans(data.values, n_clusters = 3, init = 'random', n_init = 30, max_iter = 1000)
 	# clustering = Birch(data.values, n_clusters = None)
 	# clustering = DBSCAN(data.values)
-	clustering = MeanShift(data.values)
+	# clustering = MeanShift(data.values)
+	clustering = AffinityPropagation(data.values)
 	clustering.execute()
 
 	# Discretizar dados

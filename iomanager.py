@@ -8,7 +8,7 @@ class IOManager(object):
 	"""IOManager. Classe responsável pela leitura e escrita de arquivos"""
 	def __init__(self):
 		super(IOManager, self).__init__()
-	
+
 
 	@staticmethod
 	def read_file(file_path, header = False):
@@ -31,6 +31,7 @@ class IOManager(object):
 		except Exception as e:
 			print('Não foi possível ler o arquivo!')
 			sys.exit(1)
+
 
 	@staticmethod
 	def write_file(content, file_name):

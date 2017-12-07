@@ -6,6 +6,7 @@ import numpy as np
 from sklearn.cluster import KMeans
 from labeling.mra import MRA
 from discretizers.ewd import EWD
+from discretizers.efd import EFD
 from clustering.kmeans import KMeans
 
 def main(argv):
@@ -24,6 +25,9 @@ def main(argv):
 	# Discretizar dados
 	ewd = EWD(data.values, 3)
 	ewd.discretize(clustering.labels_)
+
+	# efd = EFD(data.values, 3)
+	# efd.discretize(clustering.labels_)
 
 	# Executa o MLP para rotulacao
 	mra = MRA(clustering.clusters_, ewd.discrete_clusters_, len(data), data.columns, 5,

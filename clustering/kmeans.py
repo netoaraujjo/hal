@@ -1,3 +1,4 @@
+#-*- coding: utf-8 -*-
 from sklearn.cluster import KMeans as sk_KMeans
 from .clustering import Clustering
 

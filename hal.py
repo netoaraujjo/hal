@@ -8,6 +8,7 @@ from labeling.mra import MRA
 from discretizers.ewd import EWD
 from discretizers.efd import EFD
 from clustering.kmeans import KMeans
+from clustering.birch import Birch
 
 def main(argv):
 	# print('Bem vindo ao projeto HAL!\n')
@@ -19,7 +20,8 @@ def main(argv):
 	print(data.describe())
 
 	# Executa o KMeans para agrupamento
-	clustering = KMeans(data.values, n_clusters = 3, init = 'random', n_init = 30, max_iter = 1000)
+	# clustering = KMeans(data.values, n_clusters = 3, init = 'random', n_init = 30, max_iter = 1000)
+	clustering = Birch(data.values, n_clusters = None)
 	clustering.execute()
 
 	# Discretizar dados

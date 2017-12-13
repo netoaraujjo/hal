@@ -27,7 +27,7 @@ class MRA(Labeling):
 			for col, attribute in enumerate(self.attributes):
 
 				# 60% dos elementos para treino
-				qtd_elementos_treino = round(len(self.clusters[cluster]) * 0.6)
+				qtd_elementos_treino = int(round(len(self.clusters[cluster]) * 0.6))
 
 				dados_treino = self.clusters[cluster][:qtd_elementos_treino,:]
 				dados_teste = self.clusters[cluster][qtd_elementos_treino:,:]
@@ -40,7 +40,7 @@ class MRA(Labeling):
 				X_teste = np.hstack((dados_teste[:, :col], dados_teste[:, col+1:]))
 				y_teste = dados_teste[:, col]
 
-				mlp = MLPClassifier(hidden_layer_sizes = (10,), max_iter = 2000)
+				mlp = MLPClassifier(hidden_layer_sizes = (10,), max_iter = 5000)
 				mlp.fit(X_treino, y_treino)
 
 				predictions = mlp.predict(X_teste)
@@ -152,7 +152,8 @@ class MRA(Labeling):
 		self.report = ""
 
 		# Adiciona a relevancia de todos os atributos ao relatorio
-		self.report += "Relevancia de todos os atributos:\n"
+		self.report += "\n\n#   Relevancia de todos os atributos:\n"
+		self.report += "#" * 60 + "\n"
 		for cluster in clusters:
 			self.report += " Cluster: " + cluster + "\n"
 			for attr, relevance in self.relevancies[cluster].items():
@@ -162,7 +163,8 @@ class MRA(Labeling):
 
 		# Adiciona os atributos mais relevantes, de acordo coom a variacao,
 		# ao relatorio
-		self.report += ("Atributos mais relevantes (Variacao = %d):\n" % self.variacao)
+		self.report += ("\n#   Atributos mais relevantes (Variacao = %d):\n" % self.variacao)
+		self.report += "#" * 60 + "\n"
 		for cluster in clusters:
 			self.report += " Cluster: " + cluster + "\n"
 			for attr, relevance in self.most_rel[cluster].items():
@@ -171,7 +173,8 @@ class MRA(Labeling):
 
 
 		# Adiciona os rotulos ao relatorio
-		self.report += "Rotulos:\n"
+		self.report += "\n#   Rotulos:\n"
+		self.report += "#" * 60 + "\n"
 		for cluster in clusters:
 			self.report += " Cluster: " + cluster + "\n"
 
@@ -191,7 +194,7 @@ class MRA(Labeling):
 																	 self.hit[cluster]['cluster_hit'],
 																	 len(self.clusters[cluster])))
 
-		self.report += (" Acuracia geral: %.2f%% (%d/%d)\n" % (self.total_accuracy_,
+		self.report += (" ACURACIA GERAL: %.2f%% (%d/%d)\n" % (self.total_accuracy_,
 															   self.total_hit,
 															   self.n_elements))
 

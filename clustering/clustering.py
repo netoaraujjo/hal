@@ -38,6 +38,11 @@ class Clustering(ABC):
         clusters = {}
         for c in range(len(labels)):
             cluster_index = str(labels[c])
+
+            # Remover em caso de problema com keys
+            if labels[c] < 10:
+                cluster_index = "0" + cluster_index
+
             if cluster_index in clusters.keys():
                 clusters[cluster_index] = np.vstack((clusters[cluster_index], data[c]))
             else:

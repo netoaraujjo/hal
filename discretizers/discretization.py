@@ -40,6 +40,11 @@ class Discretization(ABC):
         discrete_clusters = {} # armazena os clusters com valores originais
         for c in range(len(labels)):
             cluster_index = str(labels[c])
+
+            # Remover em caso de problema com keys
+            if labels[c] < 10:
+                cluster_index = "0" + cluster_index
+
             if cluster_index in discrete_clusters.keys():
                 discrete_clusters[cluster_index] = np.vstack((discrete_clusters[cluster_index],
                                                               discrete_data[c]))
